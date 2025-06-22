@@ -1,46 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>VTI Viewer</title>
-    <script src="https://kitware.github.io/glance/latest/glance.min.js"></script>
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        width: 100%;
-        overflow: hidden;
+<head>
+  <meta charset="UTF-8" />
+  <title>VTI Viewer</title>
+  <script src="https://kitware.github.io/glance/latest/glance.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    const VTI_URL = "https://script.google.com/macros/s/AKfycbxAZnvXFAQmZqvg5uarXmyCfnxOxK6psxfnfECaUgAtekXmxCvzzMI3Vjt7wIAWEA/exec";
+
+    async function loadVTI() {
+      try {
+        const response = await fetch(VTI_URL);
+        if (!response.ok) throw new Error("Failed to fetch file");
+
+        const blob = await response.blob();
+        const objectURL = URL.createObjectURL(blob);
+
+        const container = document.querySelector("#app");
+        const viewer = window.glance.createViewer(container);
+        viewer.setUrl(objectURL, "vti");
+      } catch (error) {
+        document.body.innerHTML = `<h2 style="color:red;">❌ Failed to load .vti file</h2><p>${error.message}</p>`;
+        console.error(error);
       }
-      #app {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script>
-      const VTI_URL = "https://script.google.com/macros/s/AKfycbxAZnvXFAQmZqvg5uarXmyCfnxOxK6psxfnfECaUgAtekXmxCvzzMI3Vjt7wIAWEA/exec";
+    }
 
-      async function loadVTI() {
-        try {
-          const response = await fetch(VTI_URL);
-          if (!response.ok) throw new Error("Failed to fetch .vti file");
-
-          const blob = await response.blob();
-          const file = new File([blob], "latest.vti", { type: blob.type });
-
-          const container = document.querySelector("#app");
-          const viewer = window.glance.createViewer(container);
-          viewer.setFiles([file]);
-        } catch (error) {
-          document.body.innerHTML = `<h2 style="color:red;">❌ Failed to load .vti file</h2><p>${error}</p>`;
-          console.error(error);
-        }
-      }
-
-      loadVTI();
-    </script>
-  </body>
+    loadVTI();
+  </script>
+</body>
 </html>
