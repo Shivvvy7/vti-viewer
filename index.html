@@ -2,38 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Auto VTI Viewer</title>
-  <script src="https://unpkg.com/@kitware/vtk.js"></script>
+  <title>VTI Viewer</title>
   <script src="https://unpkg.com/itk-vtk-viewer@latest/dist/itk-vtk-viewer.js"></script>
   <style>
     html, body {
-      margin: 0;
-      padding: 0;
       height: 100%;
-      overflow: hidden;
+      margin: 0;
+      background: #000;
     }
     #viewer {
-      width: 100%;
-      height: 100%;
+      height: 100vh;
     }
   </style>
 </head>
 <body>
   <div id="viewer"></div>
   <script>
-    const viewer = window.createViewer(document.getElementById('viewer'), {
-      uiContainer: document.body,
-    });
+    async function loadVTI() {
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxAZnvXFAQmZqvg5uarXmyCfnxOxK6psxfnfECaUgAtekXmxCvzzMI3Vjt7wIAWEA/exec");
 
-    fetch("https://script.google.com/macros/s/AKfycbxAZnvXFAQmZqvg5uarXmyCfnxOxK6psxfnfECaUgAtekXmxCvzzMI3Vjt7wIAWEA/exec")
-      .then(response => response.blob())
-      .then(blob => {
-        const file = new File([blob], "latest.vti");
-        viewer.setImage(file);
-      })
-      .catch(err => {
-        alert("❌ Failed to load VTI file: " + err);
-      });
+        if (!response.ok) {
+          throw new Error("❌ Could not fetch file. HTTP " + response.status);
+        }
+
+        const blob = await response.blob();
+        const file = new File([blob], "latest.vti", { type: blob.type || "application/octet-stream" });
+
+        itkVtkViewer.createViewer(document.getElementById("viewer"), {
+          files: [file],
+          config: {
+            showControls: true,
+            allowDrop: false
+          }
+        });
+      } catch (error) {
+        console.error("❌ Failed to load file:", error);
+        document.body.innerHTML = "<h2 style='color:white;'>❌ Failed to load .vti file<br>Check Console for error.</h2>";
+      }
+    }
+
+    loadVTI();
   </script>
 </body>
 </html>
