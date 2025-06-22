@@ -1,52 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>VTI Viewer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-      }
-      #viewer {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Auto VTI Viewer</title>
+  <script src="https://unpkg.com/@kitware/vtk.js"></script>
+  <script src="https://unpkg.com/itk-vtk-viewer@latest/dist/itk-vtk-viewer.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    #viewer {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="viewer"></div>
+  <script>
+    const viewer = window.createViewer(document.getElementById('viewer'), {
+      uiContainer: document.body,
+    });
 
-  <body>
-    <div id="viewer"></div>
-
-    <!-- Load Glance from CDN -->
-    <script src="https://unpkg.com/@kitware/glance@latest/dist/glance.min.js"></script>
-
-    <script>
-      const viewer = window.glance.createViewer({
-        background: [0, 0, 0],
+    fetch("https://script.google.com/macros/s/AKfycbxAZnvXFAQmZqvg5uarXmyCfnxOxK6psxfnfECaUgAtekXmxCvzzMI3Vjt7wIAWEA/exec")
+      .then(response => response.blob())
+      .then(blob => {
+        const file = new File([blob], "latest.vti");
+        viewer.setImage(file);
+      })
+      .catch(err => {
+        alert("❌ Failed to load VTI file: " + err);
       });
-      document.getElementById('viewer').appendChild(viewer.getRootContainer());
-
-      // Your Google Apps Script URL that returns latest VTI file
-      const fileUrl = "https://script.google.com/macros/s/AKfycbxAZnvXFAQmZqvg5uarXmyCfnxOxK6psxfnfECaUgAtekXmxCvzzMI3Vjt7wIAWEA/exec";
-
-      // Load the file automatically
-      fetch(fileUrl)
-        .then((response) => {
-          if (!response.ok) throw new Error("Network response was not ok");
-          return response.blob();
-        })
-        .then((blob) => {
-          const file = new File([blob], "latest.vti");
-          viewer.processFiles([file]);
-        })
-        .catch((error) => {
-          alert("❌ Failed to load file: " + error);
-          console.error("Failed to fetch and load VTI:", error);
-        });
-    </script>
-  </body>
+  </script>
+</body>
 </html>
