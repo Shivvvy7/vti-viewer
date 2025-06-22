@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Automatic VTI Viewer</title>
+  <script src="https://kitware.github.io/glance/app.js"></script>
+  <style>
+    html, body, #glanceContainer {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="glanceContainer"></div>
+  <script>
+    const container = document.getElementById('glanceContainer');
+
+    // Wait for Glance to be loaded
+    const checkGlanceReady = setInterval(() => {
+      if (window.glance) {
+        clearInterval(checkGlanceReady);
+
+        // Initialize Glance viewer
+        const viewer = window.glance.createViewer(container);
+
+        // Load your .vti file directly from the Apps Script URL
+        const fileUrl = "https://script.google.com/macros/s/AKfycbzPwkfXwkYhY_z-3yDsBJkb9MbC1b9bGlcRdEnBKn4MoYlRweirh-5NpCuCy6TqDA01-g/exec";
+
+        // Load it into the viewer
+        viewer.loadURL(fileUrl, 'LatestSimulation.vti');
+      }
+    }, 200);
+  </script>
+</body>
+</html>
+
